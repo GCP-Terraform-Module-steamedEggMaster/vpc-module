@@ -9,14 +9,10 @@ import (
 )
 
 func TestTerraformModule(t *testing.T) {
-	// 환경 변수에서 민감 정보 가져오기
-	projectID := os.Getenv("GCP_PROJECT_ID")
-
 	// Terraform 모듈 옵션 설정
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../", // 모듈 경로
 		Vars: map[string]interface{}{
-			"project_id":                  projectID,
 			"vpc_network_name":            "test-network",
 			"routing_mode":                "REGIONAL",
 			"auto_create_subnetworks":     false,

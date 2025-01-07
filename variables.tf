@@ -1,8 +1,3 @@
-variable "project_id" {
-  description = "The name of the project"
-  type        = string
-}
-
 variable "vpc_network_name" {
   description = "The name of the VPC network"
   type        = string
