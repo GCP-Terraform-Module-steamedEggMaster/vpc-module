@@ -115,11 +115,11 @@ go test -v ./test
 source = "git::https://github.com/GCP-Terraform-Module-steamedEggMaster/vpc-module.git?ref=v1.0.0"
 ```
 
-#### 모듈 ref 버전
+### Module ref 버전
 | Major | Minor | Patch |
 |-----------|-----------|----------|
-| `1.0.0`   |  `1.0.0`  | `1.0.0`  |
-| `1.0.0`   |  `1.0.0`  | `1.0.0`  |
+| `1.0.0`   |    |   |
+
 
 <br>
 
