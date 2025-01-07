@@ -16,6 +16,7 @@ func TestTerraformModule(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../", // 모듈 경로
 		Vars: map[string]interface{}{
+			"project_id":                  projectID,
 			"vpc_network_name":            "test-network",
 			"routing_mode":                "REGIONAL",
 			"auto_create_subnetworks":     false,

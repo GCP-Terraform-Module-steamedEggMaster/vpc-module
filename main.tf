@@ -1,4 +1,5 @@
 resource "google_compute_network" "main" {
+  project_id                      = var.project_id
   name                            = var.vpc_network_name
   routing_mode                    = var.routing_mode
   auto_create_subnetworks         = var.auto_create_subnetworks
