@@ -58,9 +58,12 @@ module "vpc_network" {
 ### 4. 출력값 (Outputs)
 
 | 출력명               | 설명                                    |
-|----------------------|-----------------------------------------|
-| `network_name`  | 생성된 VPC 네트워크의 이름 |
-| `network_self_link`  | 생성된 VPC 네트워크의 self-link |
+|----------------------|--------------------------------------|
+| `network_id`         | 생성된 VPC 네트워크의 ID                  |
+| `network_name`       | 생성된 VPC 네트워크의 이름                 |
+| `network_self_link`  | 생성된 VPC 네트워크의 self-link           |
+| `routing_mode`       | 생성된 VPC 네트워크의 라우팅 모드            |
+| `gateway_ip`         | 생성된 VPC 네트워크의 게이트웨이 IP 주소      |
 
 <br>
 
