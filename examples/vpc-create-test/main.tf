@@ -13,5 +13,5 @@ module "vpc_network" {
 
   # IPv6 설정
   enable_ula_internal_ipv6 = true
-  internal_ipv6_range      = "fd20::/48"
+  internal_ipv6_range      = "fd20:1234:5678::/48"
 }
