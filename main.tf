@@ -16,7 +16,6 @@ resource "google_compute_network" "network" {
 
   ## 방화벽 및 네트워크 프로필
   network_firewall_policy_enforcement_order = var.network_firewall_policy_enforcement_order # 방화벽 정책 순서
-  network_profile                           = var.network_profile                           # 네트워크 프로필
 
   ## 프로젝트 정보
   project = var.project # 네트워크가 속한 프로젝트 ID

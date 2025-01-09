@@ -57,12 +57,6 @@ variable "network_firewall_policy_enforcement_order" {
   default     = "AFTER_CLASSIC_FIREWALL"
 }
 
-variable "network_profile" {
-  description = "적용할 네트워크 프로파일의 전체 또는 일부 URL"
-  type        = string
-  default     = null
-}
-
 ## 프로젝트 정보
 variable "project" {
   description = "네트워크가 속한 GCP 프로젝트 ID"
