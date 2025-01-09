@@ -6,18 +6,33 @@ GCP Terraform vpc module Repo
 
 <br>
 
+## 📑 **목차**
+1. [모듈 특징](#모듈-특징)
+2. [사용 방법](#사용-방법)
+    1. [사전 준비](#1-사전-준비)
+    2. [입력 변수](#2-입력-변수)
+    3. [모듈 호출 예시](#3-모듈-호출-예시)
+    4. [출력값 (Outputs)](#4-출력값-outputs)
+    5. [지원 버전](#5-지원-버전)
+    6. [모듈 개발 및 관리](#6-모듈-개발-및-관리)
+3. [테스트](#terratest를-이용한-테스트)
+4. [주요 버전 관리](#주요-버전-관리)
+5. [기여](#기여-contributing)
+6. [라이선스](#라이선스-license)
+
 ---
 
-## 📋 **모듈 특징**
+## 모듈 특징
 
 - 사용자 정의 VPC 네트워크 생성.
 - 자동 서브네트워크 생성 비활성화 옵션 제공.
 - 네트워크 라우팅 모드 설정 가능 (`REGIONAL` 또는 `GLOBAL`).
-- MTU(Maximum Transmission Unit) 및 기본 경로 삭제 옵션 제공.
+- IPv6 설정 및 MTU(Maximum Transmission Unit) 설정 지원.
+- 기본 경로 삭제 옵션 제공.
 
 ---
 
-## 🔧 사용 방법
+## 사용 방법
 
 ### 1. 사전 준비
 
@@ -29,13 +44,21 @@ GCP Terraform vpc module Repo
 
 ### 2. 입력 변수
 
-| 변수명                        | 타입   | 필수 여부 | 기본값             | 설명                                   |
-|-------------------------------|--------|-----------|--------------------|----------------------------------------|
-| `vpc_network_name`            | string | ✅        | 없음               | VPC 네트워크의 이름                    |
-| `routing_mode`                | string | ❌        | `REGIONAL`         | 네트워크 라우팅 모드 (`REGIONAL` 또는 `GLOBAL`) |
-| `auto_create_subnetworks`     | bool   | ❌        | `false`            | 자동 서브네트워크 생성 여부            |
-| `mtu`                         | number | ❌        | `1460`             | 네트워크 MTU 설정                      |
-| `delete_default_routes_on_create` | bool | ❌      | `false`            | 네트워크 생성 시 기본 경로 삭제 여부   |
+| 변수명                                | 타입   | 필수 여부 | 기본값                  | 설명                                   |
+|---------------------------------------|--------|-----------|-------------------------|----------------------------------------|
+| `name`                                | string | ✅        | 없음                    | 네트워크 이름 (RFC1035 규칙 준수)      |
+| `description`                         | string | ❌        | `null`                  | 네트워크 설명                         |
+| `auto_create_subnetworks`             | bool   | ❌        | `true`                  | 자동 서브네트워크 생성 여부            |
+| `routing_mode`                        | string | ❌        | `REGIONAL`              | 네트워크 라우팅 모드 (`REGIONAL` 또는 `GLOBAL`) |
+| `mtu`                                 | number | ❌        | `1460`                  | 네트워크의 최대 전송 단위              |
+| `delete_default_routes_on_create`     | bool   | ❌        | `false`                 | 기본 라우트 삭제 여부                 |
+| `enable_ula_internal_ipv6`            | bool   | ❌        | `null`                  | ULA 내부 IPv6 활성화 여부             |
+| `internal_ipv6_range`                 | string | ❌        | `null`                  | 활성화된 ULA 내부 IPv6 범위 (/48)     |
+| `network_firewall_policy_enforcement_order` | string | ❌   | `AFTER_CLASSIC_FIREWALL` | 방화벽 정책 평가 순서 설정           |
+| `project`                             | string | ✅        | 없음                    | 네트워크가 속한 GCP 프로젝트 ID       |
+| `timeout_create`                      | string | ❌        | `20m`                   | 리소스 생성 제한 시간                 |
+| `timeout_update`                      | string | ❌        | `20m`                   | 리소스 업데이트 제한 시간             |
+| `timeout_delete`                      | string | ❌        | `20m`                   | 리소스 삭제 제한 시간                 |
 
 <br>
 
@@ -45,11 +68,19 @@ GCP Terraform vpc module Repo
 module "vpc_network" {
   source = "git::https://github.com/GCP-Terraform-Module-steamedEggMaster/vpc-module.git?ref=v1.0.0"
 
-  vpc_network_name            = "custom-vpc"
-  routing_mode                = "REGIONAL"
-  auto_create_subnetworks     = false
-  mtu                         = 1460
-  delete_default_routes_on_create = false
+  name                                = "custom-vpc"
+  description                         = "Custom VPC Network"
+  auto_create_subnetworks             = false
+  routing_mode                        = "GLOBAL"
+  mtu                                 = 1460
+  delete_default_routes_on_create     = true
+  enable_ula_internal_ipv6            = true
+  internal_ipv6_range                 = "fd20:1234:abcd::/48"
+  project                             = "your-gcp-project-id"
+  network_firewall_policy_enforcement_order = "BEFORE_CLASSIC_FIREWALL"
+  timeout_create                      = "30m"
+  timeout_update                      = "30m"
+  timeout_delete                      = "30m"
 }
 ```
 
@@ -57,13 +88,17 @@ module "vpc_network" {
 
 ### 4. 출력값 (Outputs)
 
-| 출력명               | 설명                                    |
-|----------------------|--------------------------------------|
-| `network_id`         | 생성된 VPC 네트워크의 ID                  |
-| `network_name`       | 생성된 VPC 네트워크의 이름                 |
-| `network_self_link`  | 생성된 VPC 네트워크의 self-link           |
-| `routing_mode`       | 생성된 VPC 네트워크의 라우팅 모드            |
-| `gateway_ip`         | 생성된 VPC 네트워크의 게이트웨이 IP 주소      |
+| 출력명                   | 설명                                   |
+|--------------------------|----------------------------------------|
+| `id`                    | VPC 네트워크의 고유 ID                 |
+| `name`                  | VPC 네트워크의 이름                    |
+| `self_link`             | VPC 네트워크의 self-link (URI)         |
+| `routing_mode`          | VPC 네트워크의 라우팅 모드             |
+| `gateway_ipv4`          | VPC 네트워크의 기본 게이트웨이 IP 주소 |
+| `project`               | 네트워크가 속한 GCP 프로젝트 ID        |
+| `auto_create_subnetworks` | 자동 서브네트워크 생성 여부            |
+| `mtu`                   | VPC 네트워크의 최대 전송 단위          |
+| `enable_ula_internal_ipv6` | 내부 ULA IPv6 활성화 여부             |
 
 <br>
 
@@ -86,19 +121,21 @@ module "vpc_network" {
 
 - **저장소 구조**:
   ```
-  api-module/
-    ├── main.tf        # 모듈의 핵심 구현
-    ├── variables.tf   # 입력 변수 정의
-    ├── outputs.tf     # 출력 정의
-    ├── README.md      # 문서화 파일
-    ├── test/          # 테스트 구성 디렉터리
+  vpc-module/
+  ├── .github/workflows/  # github actions 자동화 테스트
+  ├── examples/           # 테스트를 위한 루트 모듈 모음 디렉터리
+  ├── test/               # 테스트 구성 디렉터리
+  ├── main.tf             # 모듈의 핵심 구현
+  ├── variables.tf        # 입력 변수 정의
+  ├── outputs.tf          # 출력 정의
+  ├── README.md           # 문서화 파일
   ```
 <br>
 
 
 ---
 
-### Terratest를 이용한 테스트
+## Terratest를 이용한 테스트
 이 모듈을 테스트하려면 제공된 Go 기반 테스트 프레임워크를 사용하세요. 아래를 확인하세요:
 
 1. Terraform 및 Go 설치.
