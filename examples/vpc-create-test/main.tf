@@ -10,8 +10,4 @@ module "vpc_network" {
   routing_mode                    = "REGIONAL"
   mtu                             = 1500
   delete_default_routes_on_create = true
-
-  # IPv6 설정
-  enable_ula_internal_ipv6 = true
-  internal_ipv6_range      = "fd20:1234:5678::/48"
 }
